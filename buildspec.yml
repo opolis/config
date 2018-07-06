@@ -1,4 +1,7 @@
 version: 0.2
+env:
+    variables:
+        SRC_DIR: src/github.com/opolis/secret
 phases:
     install:
         commands:
@@ -6,12 +9,7 @@ phases:
             - ssh-keyscan -H github.com >> ~/.ssh/known_hosts
     pre_build:
         commands:
-            - START_PATH=$(pwd)
-            - BUILD_PATH=github.com/opolis/secret
             - pwd
-            - mkdir -p $BUILD_PATH
-            - cd $BUILD_PATH
-            - cp -R $START_PATH/ .
             - dep ensure
     build:
         commands:
