@@ -1,0 +1,178 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "opolis/secret CLI tool",
+    "Parameters": {
+        "ArtifactStore": {
+            "Description": "pipeline artifact bucket",
+            "Type": "String"
+        },
+        "RepoOwner": {
+            "Description": "repo owner (account)",
+            "Type": "String"
+        },
+        "RepoName": {
+            "Description": "repo name",
+            "Type": "String"
+        },
+        "RepoBranch": {
+            "Description": "git branch",
+            "Type": "String"
+        },
+        "RepoToken": {
+            "Description": "oauth token",
+            "Type": "String",
+            "NoEcho": true
+        },
+        "Stage": {
+            "Description": "development | master | release",
+            "Type": "String"
+        },
+        "BuildImage": {
+            "Description": "ECR docker image for codebuild project",
+            "Type": "String"
+        }
+    },
+    "Resources": {
+        "Pipeline": {
+            "Type": "AWS::CodePipeline::Pipeline",
+            "Properties": {
+                "Name": { "Ref": "AWS::StackName" },
+                "ArtifactStore": {
+                    "Location": { "Ref": "ArtifactStore" },
+                    "Type": "S3"
+                },
+                "RoleArn": { "Fn::GetAtt": [ "PipelineRole", "Arn" ] },
+                "Stages": [
+                    {
+                        "Name": "Source",
+                        "Actions": [{
+                            "Name": "GitHub",
+                            "ActionTypeId": {
+                                "Category": "Source",
+                                "Owner": "ThirdParty",
+                                "Provider": "GitHub",
+                                "Version": "1"
+                            },
+                            "Configuration": {
+                                "Owner": { "Ref": "RepoOwner" },
+                                "Repo": { "Ref": "RepoName" },
+                                "Branch": { "Ref": "RepoBranch" },
+                                "OAuthToken": { "Ref": "RepoToken" },
+                                "PollForSourceChanges": false
+                            },
+                            "OutputArtifacts": [ { "Name": "source" } ],
+                            "RunOrder": 1
+                        }]
+                    },
+                    {
+                        "Name": "Build",
+                        "Actions": [{
+                            "Name": "CodeBuild",
+                            "ActionTypeId": {
+                                "Category": "Build",
+                                "Owner": "AWS",
+                                "Provider": "CodeBuild",
+                                "Version": "1"
+                            },
+                            "Configuration": {
+                                "ProjectName": { "Ref": "CodeBuildProject" }
+                            },
+                            "InputArtifacts": [ { "Name": "source" } ],
+                            "OutputArtifacts": [ { "Name": "build" } ],
+                            "RunOrder": 1
+                        }]
+                    }
+                ]
+            }
+        },
+        "CodeBuildProject": {
+            "Type": "AWS::CodeBuild::Project",
+            "Properties": {
+                "Name": { "Fn::Sub": "${RepoOwner}-${RepoName}-${RepoBranch}" },
+                "Source": {
+                    "Type": "CODEPIPELINE"
+                },
+                "Artifacts": {
+                    "Type": "CODEPIPELINE"
+                },
+                "Cache": {
+                    "Location": { "Fn::Sub": "${ArtifactStore}/cache" },
+                    "Type": "S3"
+                },
+                "Environment": {
+                    "ComputeType": "BUILD_GENERAL1_SMALL",
+                    "Type": "LINUX_CONTAINER",
+                    "Image": { "Ref": "BuildImage" }
+                },
+                "TimeoutInMinutes": 60,
+                "ServiceRole": { "Fn::GetAtt": [ "CodeBuildRole", "Arn" ] }
+            }
+        },
+        "CodeBuildRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "Path": "/",
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [{
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "codebuild.amazonaws.com"
+                        },
+                        "Action": "sts:AssumeRole"
+                    }]
+                },
+                "Policies": [{
+                    "PolicyName": "root",
+                    "PolicyDocument": {
+                        "Version": "2012-10-17",
+                        "Statement": [
+                            {
+                                "Effect": "Allow",
+                                "Action": "logs:*",
+                                "Resource": "*"
+                            },
+                            {
+                                "Effect": "Allow",
+                                "Action": "s3:*",
+                                "Resource": [
+                                    { "Fn::Sub": "arn:aws:s3:::${ArtifactStore}" },
+                                    { "Fn::Sub": "arn:aws:s3:::${ArtifactStore}/*" }
+                                ]
+                            }
+                        ]
+                    }
+                }]
+            }
+        },
+        "PipelineRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "Path": "/",
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "codepipeline.amazonaws.com"
+                            },
+                            "Action": "sts:AssumeRole"
+                        }
+                    ]
+                },
+                "Policies": [{
+                    "PolicyName": "root",
+                    "PolicyDocument": {
+                        "Version": "2012-10-17",
+                        "Statement": [{
+                            "Effect": "Allow",
+                            "Action": "*",
+                            "Resource": "*"
+                        }]
+                    }
+                }]
+            }
+        }
+    }
+}

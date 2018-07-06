@@ -1,0 +1,11 @@
+{
+    "development": [
+        { "ParameterKey": "BuildImage", "ParameterValue": "aws/codebuild/golang:1.10" }
+    ],
+    "master": [
+        { "ParameterKey": "BuildImage", "ParameterValue": "aws/codebuild/golang:1.10" }
+    ],
+    "release": [
+        { "ParameterKey": "BuildImage", "ParameterValue": "aws/codebuild/golang:1.10" }
+    ]
+}

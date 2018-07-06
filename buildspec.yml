@@ -1,0 +1,17 @@
+version: 0.2
+phases:
+    install:
+        commands:
+            - mkdir -p ~/.ssh
+            - ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+    pre_build:
+        commands:
+            - dep ensure
+    build:
+        commands:
+            - go build -o secret main.go
+artifacts:
+    files: secret
+cache:
+    paths:
+        - 'vendor/**/*'
