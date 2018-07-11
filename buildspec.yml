@@ -6,15 +6,15 @@ phases:
             - ssh-keyscan -H github.com >> ~/.ssh/known_hosts
     pre_build:
         commands:
-            - PACKAGE=github.com/opolis/secret
+            - PACKAGE=github.com/opolis/config
             - mkdir -p /go/src/$PACKAGE
             - cp -a $CODEBUILD_SRC_DIR/. /go/src/$PACKAGE
     build:
         commands:
             - cd /go/src/$PACKAGE && dep ensure
-            - cd /go/src/$PACKAGE && go build -o $CODEBUILD_SRC_DIR/secret main.go
+            - cd /go/src/$PACKAGE && go build -o $CODEBUILD_SRC_DIR/config main.go
 artifacts:
     files: secret
 cache:
     paths:
-        - '/go/src/github.com/opolis/secret/vendor/**/*'
+        - '/go/src/github.com/opolis/config/vendor/**/*'

@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "opolis/secret CLI tool",
+    "Description": "opolis/config CLI tool",
     "Parameters": {
         "ArtifactStore": {
             "Description": "pipeline artifact bucket",

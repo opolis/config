@@ -1,5 +1,5 @@
-IMAGE = opolis/secret:dev
-GOPATH = /go/src/github.com/opolis/secret
+IMAGE = opolis/config:dev
+GOPATH = /go/src/github.com/opolis/config
 
 RUN = docker run -it --rm \
 	  -v $(HOME)/.aws:/root/.aws \
