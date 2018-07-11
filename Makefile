@@ -1,5 +1,6 @@
 IMAGE = opolis/config:dev
 GOPATH = /go/src/github.com/opolis/config
+BIN=config
 
 RUN = docker run -it --rm \
 	  -v $(HOME)/.aws:/root/.aws \
@@ -20,7 +21,7 @@ deps:
 
 .PHONY: build
 build:
-	@$(RUN) $(COMPILE) -o secret main.go
+	@$(RUN) $(COMPILE) -o $(BIN) main.go
 
 .PHONY: shell
 shell:

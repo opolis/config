@@ -9,6 +9,8 @@ import (
 	"github.com/aws/aws-sdk-go/service/ssm"
 )
 
+const version = "v0.4.0"
+
 func main() {
 	// Read secret parameter key from CLI
 	if len(os.Args) != 2 {
@@ -17,7 +19,9 @@ func main() {
 	}
 
 	// AWS session
-	sess := session.Must(session.NewSession())
+	sess := session.Must(session.NewSessionWithOptions(session.Options{
+		SharedConfigState: session.SharedConfigEnable,
+	}))
 
 	// SSM client
 	client := ssm.New(sess)
