@@ -24,12 +24,21 @@
             "NoEcho": true
         },
         "Stage": {
-            "Description": "development | master | release",
+            "Description": "build stage",
+            "AllowedValues": [ "development", "master", "release" ],
             "Type": "String"
         },
         "BuildImage": {
             "Description": "ECR docker image for codebuild project",
             "Type": "String"
+        }
+    },
+    "Conditions": {
+        "IsRelease": {
+            "Fn::Equals": [
+                { "Ref": "Stage" },
+                "release"
+            ]
         }
     },
     "Resources": {
@@ -88,7 +97,13 @@
         "CodeBuildProject": {
             "Type": "AWS::CodeBuild::Project",
             "Properties": {
-                "Name": { "Fn::Sub": "${RepoOwner}-${RepoName}-${RepoBranch}" },
+                "Name": {
+                    "Fn::If": [
+                        "IsRelease",
+                        { "Fn::Sub": "${RepoOwner}-${RepoName}-${Stage}" },
+                        { "Fn::Sub": "${RepoOwner}-${RepoName}-${RepoBranch}" }
+                    ]
+                },
                 "Source": {
                     "Type": "CODEPIPELINE"
                 },
