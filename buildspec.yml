@@ -14,7 +14,7 @@ phases:
             - cd /go/src/$PACKAGE && dep ensure
             - cd /go/src/$PACKAGE && go build -o $CODEBUILD_SRC_DIR/config main.go
 artifacts:
-    files: secret
+    files: config
 cache:
     paths:
         - '/go/src/github.com/opolis/config/vendor/**/*'
