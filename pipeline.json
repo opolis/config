@@ -33,14 +33,6 @@
             "Type": "String"
         }
     },
-    "Conditions": {
-        "IsRelease": {
-            "Fn::Equals": [
-                { "Ref": "Stage" },
-                "release"
-            ]
-        }
-    },
     "Resources": {
         "Pipeline": {
             "Type": "AWS::CodePipeline::Pipeline",
@@ -97,13 +89,7 @@
         "CodeBuildProject": {
             "Type": "AWS::CodeBuild::Project",
             "Properties": {
-                "Name": {
-                    "Fn::If": [
-                        "IsRelease",
-                        { "Fn::Sub": "${RepoOwner}-${RepoName}-${Stage}" },
-                        { "Fn::Sub": "${RepoOwner}-${RepoName}-${RepoBranch}" }
-                    ]
-                },
+                "Name": { "Fn::Sub": "${RepoOwner}-${RepoName}-${RepoBranch}" },
                 "Source": {
                     "Type": "CODEPIPELINE"
                 },
