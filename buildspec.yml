@@ -1,7 +1,4 @@
 version: 0.2
-env:
-    variables:
-        SRC_DIR: src/github.com/opolis/secret
 phases:
     install:
         commands:
@@ -20,4 +17,4 @@ artifacts:
     files: secret
 cache:
     paths:
-        - 'vendor/**/*'
+        - '/go/src/github.com/opolis/secret/vendor/**/*'
