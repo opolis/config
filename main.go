@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials/stscreds"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/ssm"
 )
@@ -19,12 +20,11 @@ func main() {
 	}
 
 	// AWS session
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable,
-	}))
+	sess := session.Must(session.NewSession())
+	creds := stscreds.NewCredentials(sess, os.Getenv("AWS_ROLE_ARN"))
 
 	// SSM client
-	client := ssm.New(sess)
+	client := ssm.New(sess, &aws.Config{Credentials: creds})
 
 	// Get secret value by key name
 	key := os.Args[1]
