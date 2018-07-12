@@ -10,7 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/ssm"
 )
 
-const version = "v0.4.0"
+const version = "v0.5.0"
 
 func main() {
 	// Read secret parameter key from CLI
