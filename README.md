@@ -18,7 +18,7 @@ and always opt for using this in conjunction with an environment variable, set a
 ENV_VAR=$(./config <SSM parameter name>)
 ```
 
-### Authorization
+### Authorization and Setup
 
 When including this tool in a service, the service must have the following IAM statements
 included in its role policy.
@@ -42,3 +42,18 @@ included in its role policy.
 ```
 
 where `<SSM key id>` is the UUID of the encryption key you chose when pushing the value to SSM.
+
+Also, you *must* set the default region environment variable in the service's task defintion to match the
+region where the SSM value exists. This is used by the AWS SDK inside this utility.
+
+In CloudFormation,
+
+```
+"ContainerDefinitions": [{
+    ...
+    "Environment": [
+        { "Name": "AWS_DEFAULT_REGION", "Value": { "Ref": "AWS::Region" } },
+        ...
+    ],
+    ...
+```
