@@ -43,10 +43,15 @@ included in its role policy.
 
 where `<SSM key id>` is the UUID of the encryption key you chose when pushing the value to SSM.
 
-Also, you *must* set the default region environment variable in the service's task defintion to match the
-region where the SSM value exists. This is used by the AWS SDK inside this utility.
+Be sure to assign your IAM task roles to the task definition like so,
 
-In CloudFormation,
+```
+"ExecutionRoleArn": { "Fn::GetAtt": [ "ECSTaskRole", "Arn" ] },
+"TaskRoleArn": { "Fn::GetAtt": [ "ECSTaskRole", "Arn" ] },
+```
+
+Also, set the default region environment variable in the service's task defintion to match the
+region where the SSM value exists. This is used by the AWS SDK inside this utility.
 
 ```
 "ContainerDefinitions": [{
@@ -57,3 +62,4 @@ In CloudFormation,
     ],
     ...
 ```
+
