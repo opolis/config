@@ -9,7 +9,7 @@ RUN = docker run -it --rm \
 	  -w $(GOPATH) \
 	  $(IMAGE)
 
-COMPILE = env GOOS=linux go build -ldflags="-s -w"
+COMPILE = env GOOS=darwin go build -ldflags="-s -w"
 
 .PHONY: image
 image:
